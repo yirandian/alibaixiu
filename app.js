@@ -12,6 +12,7 @@ const bodyParser = require('body-parser')
 
 // 引入本地模块
 const usersRouter = require('./router/usersRouter.js')
+const categoryRouter = require('./router/categoryRouter.js')
 
 //创建服务器
 const app = express();
@@ -33,9 +34,10 @@ app.use('/static/uploads', express.static('./uploads'))
 // 注册路由中间件
 // app.use(demoRouter)
 app.use(usersRouter)
+app.use(categoryRouter) // 与 分类 相关的路由
 
 
 //3.开启服务器
 app.listen(3000,()=>{
-console.log('success');
+console.log('服务器已经开启：localhost:3000/');
 });
