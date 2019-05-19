@@ -13,6 +13,6 @@ router.get('/categories',categoryContr.categories)
       })
       .get('/editData',categoryContr.editData)
       .post('/updateData',categoryContr.updateData)
-
+      .post('/delAllCateByIds',categoryContr.delAllCateByIds)
 // 暴露接口
 module.exports = router

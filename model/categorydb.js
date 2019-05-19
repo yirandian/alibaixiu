@@ -1,28 +1,82 @@
-// 执行 分类 表的 db 文件
-// 执行所有与用户表相关的数据库操作
-const mysql = require('mysql')
+const db = require('../model/db.js')
 
-module.exports.query = (sql, callback) => {
-    // 创建一个连接对象
-    const connection = mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: '970423',
-        database: 'baixiu'
-    })
-    // 用户链接
-    connection.connect()
-    // 执行 sql 语句
-    connection.query(sql, (err, result) => {
-        if (err) {
-            // 问题：查询数据库出错后，不应该自己将问题进行输出，应该将问返回给控制器，由控制器来决定问题应该如何解决
-            // 原则：将错误交给控制器：
-            // 原则：将错误信息与成功结果分开（给回调函数两个参数：第一个参数表示错误，第二个参数表示成功）
-            return callback(err, null) // 将错误信息交给了回调函数
-        }
-        // 执行成回调函数
-        callback(null, result)
-    })
-    // 关闭连接
-    connection.end()
+module.exports = {
+    query:db.query,
+    // 直接返回 categories 页面
+    categories: (req, res) => {
+        res.render('categories', {})
+    },
+    // 得到所有的分类数据
+    getAllData: function(callback) {
+        // 执行 sql 语句
+        let selSql = `SELECT * FROM categories`
+        db.query(selSql, (err, result) => {
+            callback(err, result)
+        })
+    },
+    addData: function(obj,callback) {
+        // console.log(222);
+        
+        // 获取提交的数据
+        // let params = req.body
+        // console.log(params)
+        let addSql = `INSERT INTO categories (slug,name) VALUES ('${obj.slug}','${obj.name}')`
+        db.query(addSql,(err,result) =>{
+            callback(err,result)
+        })
+
+    },
+    delData: (req,res) =>{
+        // 接收 id 
+        let id = req.body.id
+        // console.log(id);
+        let delSql = `DELETE FROM categories WHERE id = ${id}`
+        console.log(delSql);
+        categorydb.query(delSql,(err,result) =>{
+            res.send({
+                status: 200,
+                msg: '删除成功'
+            })
+        })
+    },
+    editData: (req,res) =>{
+        
+        // 接收 id 
+        let id = req.query.id
+        // console.log(id);
+        let editSql = `SELECT * FROM categories WHERE id=${id}`
+        categorydb.query(editSql,(err,result) =>{
+            if (err) {
+                return res.send({
+                    status: 400,
+                    msg: '出错了'
+                })
+            }
+            res.send({
+                status: 200,
+                msg: '查询成功',
+                data:result
+            })
+        })
+    },
+    updateData: (req,res) =>{
+        let params = req.body
+        // console.log(params);
+        let updateSql =  `UPDATE categories SET name="${params.name}",slug="${params.slug}" WHERE id=${params.id}`
+        // console.log(updateSql);
+        categorydb.query(updateSql,(err,result) =>{
+            if (err) {
+                return res.send({
+                    status: 400,
+                    msg: '出错了'
+                })
+            }
+            res.send({
+                status: 200,
+                msg: '修改成功'
+            })
+        })
+    }
+
+
 }

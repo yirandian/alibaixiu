@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="utf-8">
   <title>Sign in &laquo; Admin</title>
   <link rel="stylesheet" href="/assets/vendors/bootstrap/css/bootstrap.css">
   <link rel="stylesheet" href="/assets/css/admin.css">
 </head>
+
 <body>
   <div class="login">
     <form class="login-wrap" id="myForm">
@@ -16,7 +18,8 @@
       </div> -->
       <div class="form-group">
         <label for="email" class="sr-only">邮箱</label>
-        <input id="email" type="email" name="email" value="admin@baixiu.com" class="form-control" placeholder="邮箱" autofocus>
+        <input id="email" type="email" name="email" value="admin@baixiu.com" class="form-control" placeholder="邮箱"
+          autofocus>
       </div>
       <div class="form-group">
         <label for="password" class="sr-only">密码</label>
@@ -27,24 +30,33 @@
     </form>
   </div>
 </body>
+
 </html>
-<script src="/assets/vendors/jquery/jquery.js"></script>
+<script src="/assets/vendors/jquery/jquery.min.js"></script>
 <script>
-  // 1. 实现登陆  
-  // 1.1 给登陆按钮注册事件
-  $('#btnLogin').on('click',function () {
-    
-    // 1.2 发送ajax请求
+  // // 1. 实现登陆  
+  // // 1.1 给登陆按钮注册事件
+  $('#btnLogin').click(function (e) {
+    e.preventDefault()
+    let params = $('#myForm').serialize()
+    console.log(params);
     $.ajax({
-      type:'post',
-      url:'/login',
-      data:$('#myForm').serialize(),
-      dataType:'json',
-      success:function(res){
-        if(res&&res.code==0){
-          location.href = '/' // 跳转到主页面
+      url: '/postLoginData',
+      type: 'post',
+      data: params,
+      success: function (data) {
+        // 解构
+        let { status,msg } = data
+        // console.log(data);
+        if (status === 200) {
+          alert(msg)
+          window.location = '/users'
+        } else {
+          alert(msg)
         }
+
+
       }
-    })
+    });
   })
 </script>
