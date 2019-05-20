@@ -9,7 +9,7 @@ module.exports = {
         console.log(1);
 
         let params = req.body
-        let sql = `SELECT password FROM users WHERE email = '${params.email}'`
+        let sql = `SELECT password,nickname,avatar,id FROM users WHERE email = '${params.email}'`
         console.log(sql);
         logindb.query(sql,  (err,result) => {
             console.log(result);
@@ -33,12 +33,29 @@ module.exports = {
             }
             req.session.user = {
                 email: params.email,
-                password: params.password
+                password: params.password,
+                // 保存一个用户的昵称
+                nickname: result[0].nickname,
+                avatar: result[0].avatar,
+                id: result[0].id
             }
+            console.log(req.session.user)
             res.send({
                 status: 200,
                 msg:'登录成功'
             })
         })
+    },
+    // 退出登录
+    loginout: (req,res) =>{
+        // console.log(123);
+        // console.log(req.session.user);
+        req.session.user = null
+        // 响应成功的信息给浏览器
+        res.send({
+            status: 200,
+            msg:'退出成功'
+        })
+        
     }
 }

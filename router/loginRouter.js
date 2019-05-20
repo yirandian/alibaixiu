@@ -5,7 +5,7 @@ const router = express.Router()
 
 router.get('/login',loginContr.getLogin)  // 添加获取静态页面的路由
       .post('/postLoginData',loginContr.postLoginData)
-
+      .get('/loginout',loginContr.loginout)
 
 
 module.exports  = router

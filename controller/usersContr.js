@@ -1,6 +1,7 @@
 // 引入 userdb
 const userdb = require('../model/userdb.js')
-
+const formidable = require('formidable')
+const path = require('path')
 // 处理所有与 用户 相关的逻辑
 module.exports = {
     // 得到所有的用户信息,并渲染页面
@@ -70,7 +71,7 @@ module.exports = {
         })
     },
     // 修改用户
-    updateUser: (req,res) =>{
+    updateUser: (req, res) => {
         // 接收参数
         var params = req.body
         // 修改数据到 mysql
@@ -83,9 +84,9 @@ module.exports = {
         })
     },
     // 批量删除
-    delUsersByIds:(req,res) =>{
+    delUsersByIds: (req, res) => {
         // 获取提交过来的 id
-        let ids =req.body.id
+        let ids = req.body.id
         // console.log(ids);
         // 将数组转为字符串 用逗号隔开
         var idStr = ids.join(',')
@@ -94,6 +95,59 @@ module.exports = {
             res.send({
                 status: 200,
                 msg: '删除成功'
+            })
+        })
+    },
+    // 修改用户信息
+    profile: (req, res) => {
+        let id = req.session.user.id
+        let selSql = `SElECT * FROM users WHERE id = ${id}`
+        userdb.query(selSql, result => {
+            // if (err) {
+            // 跳转回 users 页面 (404)
+            // return res.send(`<script>alert('出错啦');window.location='/users'</script>`)
+            // }
+
+            res.render('profile', result[0])
+
+        })
+    },
+    // 修改用户数据
+    updateProfile: (req, res) => {
+        // 接收参数
+        let form = new formidable.IncomingForm()
+        // 修改图片上传后保存的路径
+        let imgpath = path.join(__dirname, '../uploads')
+        form.uploadDir = imgpath
+        form.keepExtensions = true
+        form.parse(req, (err, fields, files) => {
+            if (err) {
+                return res.send({
+                    status: 400,
+                    msg: '出错了'
+                })
+            }
+            // 判断图片是否存在
+            if (files.img) {
+                let name = path.basename(files.img.path)
+                fields.img = '/static/uploads/' + name
+            }
+            // 当修改了个人中的图片和昵称后需要将 session 中的信息进行更新
+            req.session.user.nickname = fields.nickname
+            req.session.user.avatar = fields.img
+            console.log(fields);
+            
+            // 将参数更新到数据库
+            let updateSql = `UPDATE users SET slug = '${fields.slug}', nickname = '${fields.nickname}', avatar = '${fields.img}', bio = '${fields.bio}' WHERE id = ${fields.id}`
+            console.log(updateSql);
+            
+            userdb.query(updateSql, result => {
+                console.log(123);
+                
+                res.send({
+                    status: 200,
+                    msg: '更新数据成功'
+                })
             })
         })
     }

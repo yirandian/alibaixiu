@@ -9,3 +9,26 @@
 </body>
 
 </html>
+<script>
+    $('#loginout').on('click',function(e){
+        e.preventDefault()
+        // console.log(123);
+        $.ajax({
+        url:'/loginout',
+        type:'get',
+        dataType:'json',
+        data:'',
+        success: function(data){
+            console.log();
+            
+            if(data.status === 200) {
+                alert(data.msg)
+                window.location = '/login'
+            }
+        }
+        });
+        
+    })
+
+
+</script>
